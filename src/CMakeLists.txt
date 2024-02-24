@@ -1,10 +1,10 @@
+cmake_minimum_required(VERSION 3.9)
+
 cmake_policy(SET CMP0091 NEW)
 set(CMAKE_POLICY_DEFAULT_CMP0091 NEW)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 project(realcugan-ncnn-vulkan)
-
-cmake_minimum_required(VERSION 3.9)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE release CACHE STRING "Choose the type of build" FORCE)
@@ -12,7 +12,7 @@ endif()
 
 option(USE_SYSTEM_NCNN "build with system libncnn" OFF)
 option(USE_SYSTEM_WEBP "build with system libwebp" OFF)
-option(USE_STATIC_MOLTENVK "link moltenvk static library" OFF)
+option(USE_STATIC_MOLTENVK "link moltenvk static library" ON)
 
 find_package(Threads)
 find_package(OpenMP)
@@ -48,7 +48,7 @@ set(CMAKE_POLICY_DEFAULT_CMP0069 NEW)
 include(CheckIPOSupported)
 check_ipo_supported(RESULT ipo_supported OUTPUT ipo_supported_output)
 if(ipo_supported)
-    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
 else()
     message(WARNING "IPO is not supported: ${ipo_supported_output}")
 endif()
@@ -256,7 +256,7 @@ add_dependencies(realcugan-ncnn-vulkan generate-spirv)
 
 set(REALCUGAN_LINK_LIBRARIES ncnn webp ${Vulkan_LIBRARY})
 
-if(USE_STATIC_MOLTENVK)
+if(APPLE AND USE_STATIC_MOLTENVK)
     find_library(CoreFoundation NAMES CoreFoundation)
     find_library(Foundation NAMES Foundation)
     find_library(Metal NAMES Metal)
